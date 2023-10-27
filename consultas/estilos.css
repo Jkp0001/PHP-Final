@@ -1,0 +1,13 @@
+th{
+    border: 1px solid black;
+    text-align: center;
+}
+
+td{
+    border: 1px solid black;
+    text-align: center;
+}
+.table-dark{
+    --bs-table-color:blueviolet;
+    --bs-table-bg: rgb(254, 221, 255);
+}
