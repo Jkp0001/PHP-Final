@@ -46,7 +46,7 @@
             $error = "No hay productos en la cesta";
         }else{
             $totalCesta = 0;
-            $lineaPedido= 0;
+            
             while($fila = $resultado -> fetch_assoc()){ /*pilla una fila y hace un array (clave = nombre variable y valor = datos)*/ 
                 echo "
                     <tr>
@@ -61,7 +61,7 @@
                                     $totalCesta = $totalCesta + $total;
                                 "</tr>
                                 <br>";
-                                $lineaPedido = $lineaPedido +1;
+                                
             }
         }
     }    
@@ -81,15 +81,23 @@
     </form>
     
     <?php 
+    
         if($_SERVER["REQUEST_METHOD"] == "POST"){
             $sql = "INSERT INTO Pedidos (usuario,precioTotal) VALUES ('$usuario','$totalCesta')";
             $conexion -> query($sql);
-            $idProductos="SELECT idProducto FROM ProductosCestas";
-            $idPedido = "SELECT idPedido FROM Pedidos";
-            $Cantidad = "SELECT cantidad FROM ProductosCestas";
-            $conexion -> query($sql);
-            $sql = "INSERT INTO LineasPedidos (lineaPedido,idProducto,idPedido,precioUnitario,cantidad) VALUES ('$lineaPedido','$idProductos', '$idPedido', '$totalCesta', '$Cantidad')";
-            $conexion -> query($sql);
+            $idPedido = $conexion ->query("SELECT idPedido FROM Pedidos where usuario = '$usuario'");
+            $idPedido = $idPedido->fetch_assoc()["idPedido"];
+
+            $idProductos="SELECT idProducto,cantidad FROM ProductosCestas WHERE idCesta='".$_SESSION['idCesta']."';";
+            $resultado = $conexion-> query($idProductos);
+            $lineaPedido= 1;
+            while($fila = $resultado->fetch_assoc()){
+                $precio = $conexion ->query("SELECT precio FROM Productos WHERE idProducto='".$fila["idProducto"]."'");
+                $precio = $precio->fetch_assoc()["precio"];
+                $sql = "INSERT INTO LineasPedidos  VALUES ('$lineaPedido','".$fila["idProducto"]."', '$idPedido', '".$precio."', '".$fila['cantidad']."')";
+                $conexion -> query($sql);
+                $lineaPedido = $lineaPedido +1;
+            }
         }
     ?>
 
@@ -98,4 +106,3 @@
 </body>
 </html>
 
-<!-- Muestro nombre producto imagen precio/u y cantidad -->
